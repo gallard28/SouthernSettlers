@@ -1,0 +1,27 @@
+####Title: Software for Pulling and Cleaning Patents Data for the Southern Settlers Project
+####Author: Grant A. Allard and Marcos Segantini 
+####Date: 
+
+####Library####
+library(patentsview)
+library(tidyr)
+library(dplyr)
+library(httr)
+library(jsonlite)
+library(utils)
+library(readcsv)
+
+
+####Pull Request: US####
+USSearch<-with_qfuns(
+  eq(inventor_lastknown_country = "US")
+)
+search_pv(USSearch, endpoint="inventors")
+
+
+
+####Pull Request: NZ####
+NZSearch<-with_qfuns(
+  eq(inventor_lastknown_country = "NZ")
+)
+search_pv(NZSearch, endpoint="inventors")
