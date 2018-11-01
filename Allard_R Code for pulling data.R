@@ -58,7 +58,7 @@ library(patentsview)
 query <- with_qfuns( # with_qfuns is basically just: with(qry_funs, ...)
   and(
     gte(patent_year = 2010),
-    eq(inventor_country = "US")
+    eq(inventor_country = "US") #UY for Uruguay and NZ for New Zealand 
   )
 )
 

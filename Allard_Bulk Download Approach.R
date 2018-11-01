@@ -2,6 +2,13 @@
 ####Author: Grant A. Allard and Marcos Segantini 
 ####Date: 
 
+#Visualizations 
+#Show NZ has more patents than UY in number. 
+#Linkage between patents and institutions. 
+
+#Visualization for next week: 
+#Map patents, inventors to Uruguay and NZ -Monday or Tuesday
+
 
 library(dplyr)
 library(stringr)
@@ -76,7 +83,6 @@ inventor_location_raw<-read_tsv(inventor_location_file, col_names=TRUE)
 inventor_location_df<-as_data_frame(inventor_location_raw)
 inventor_location_df[is.na(inventor_location_df),]<-"Not Listed"
 
-
 #Locations
 locations_file<-"/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/Data/SouthernSettlers/Data/Location/20180528/bulk-downloads/location.tsv"
 locations_raw<-read_tsv(locations_file)
@@ -88,8 +94,14 @@ locations_df$location_id<-locations_df$id
 locations_df$id<-NULL
 
 #Join Locations onto Assignee_Location 
-assignee_location_df<-left_join(assignee_location_df, locations_df, by="location_id" )
-
+inventor_location_df<-left_join(inventor_location_df, locations_df, by="location_id" )
+head(inventor_location_df)
 
 #Can't figure out how to tie these together. Need help on the disambiguation. 
+
+#Patents
+Patents_file<-"/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/SouthernSettlers/Data/Patents/data/20180528/bulk-downloads/patent.tsv"
+Patents_raw<-read_tsv(Patents_file)
+
+
 
