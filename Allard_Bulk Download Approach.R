@@ -15,13 +15,14 @@ library(stringr)
 library(readr)
 require(tidyr)
 require(ggplot2)
+library(maps)
 
 #Session Info
 sessionInfo()
 
 #Assignees####
 #Load in Assignee Data
-assignee_file<-"/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/Data/SouthernSettlers/Data/Assignee/20180528/bulk-downloads/assignee.tsv"
+assignee_file<-"assignee.tsv"
 assignee_raw<-read_tsv(assignee_file, col_names=TRUE)
 
 #Check Data
@@ -45,7 +46,7 @@ assignee_df$assignee_id<-assignee_df$id
 assignee_df$id<-NULL
 
 #Assignee Locations
-assignee_location_file<-"/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/Data/SouthernSettlers/Data/Inventor/20180528/bulk-downloads/inventor.tsv"
+assignee_location_file<-"inventor.tsv"
 assignee_location_raw<-read_tsv(assignee_location_file)
 
 #Create df
@@ -60,7 +61,7 @@ str(assignee_location_df)
 
 
 #Inventors####
-inventor_file<-"/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/Data/SouthernSettlers/Data/Inventor/20180528/bulk-downloads/inventor.tsv"
+inventor_file<-"inventor.tsv"
 inventor_raw<-read_tsv(inventor_file, col_names=TRUE)
 
 #Check Data
@@ -76,15 +77,16 @@ inventor_df$inventor_id<-inventor_df$id
 inventor_df$id<-NULL
 
 #Inventor Locations#
-inventor_location_file<- "/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/Data/SouthernSettlers/Data/Location_Inventor/20180528/bulk-downloads/location_inventor.tsv"
+inventor_location_file<- "location_inventor.tsv"
 inventor_location_raw<-read_tsv(inventor_location_file, col_names=TRUE)
 
 #Clean Data
 inventor_location_df<-as_data_frame(inventor_location_raw)
 inventor_location_df[is.na(inventor_location_df),]<-"Not Listed"
 
+
 #Locations
-locations_file<-"/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/Data/SouthernSettlers/Data/Location/20180528/bulk-downloads/location.tsv"
+locations_file<-"location.tsv"
 locations_raw<-read_tsv(locations_file)
 
 #Clean Data
@@ -100,8 +102,52 @@ head(inventor_location_df)
 #Can't figure out how to tie these together. Need help on the disambiguation. 
 
 #Patents
-Patents_file<-"/Users/GrantAllard/Documents/Allard Scholarship/Southern Settlers/SouthernSettlers/Data/Patents/data/20180528/bulk-downloads/patent.tsv"
+Patents_file<-"patent.tsv"
 Patents_raw<-read_tsv(Patents_file)
 
+#Data Cleaning####
+inventor_backup2_df<-inventor_df
+
+#Add location_id to inventor_df
+inventor_df<-left_join(inventor_df, inventor_location_df, by="inventor_id")
+View(inventor_df)
+
+#Add location information
+inventor_df<-left_join(inventor_df, locations_df, by="location_id")
+
+#Clean 'inventor_df'####
+str(inventor_df)
+
+#Convert longitude to numeric
+inventor_df$longitude<-as.numeric(inventor_df$longitude)
+
+#Find NAs on no country listed - 
+NoCountry<-(inventor_df[is.na(inventor_df$country),])
+
+#Remove from dataset - Keep 9,613,849 observations
+inventor_df<-inventor_df[!(inventor_df$inventor_id %in% NoCountry$inventor_id & is.na(inventor_df$country)),]
+
+#Find NAs on no last name - 5 of them  - Korean names all put into first name
+NoLastName<-(inventor_df[is.na(inventor_df$name_last),])
+
+#Find NAs - 13 cases missing both long and lat 
+nrow(inventor_df[is.na(inventor_df$longitude) & is.na(inventor_df$latitude) ,])
+
+#Number of results for uruguay - 318
+nrow(inventor_df[inventor_df$country=="UY",])
+
+#Find observations with country = UY, long, and lat - 318. We are good! 
+nrow(inventor_df[inventor_df$country=="UY" & !is.na(inventor_df$longitude) & !is.na(inventor_df$latitude),])
+
+
+#Number of results for New Zealand - 9,091
+nrow(inventor_df[inventor_df$country=="NZ",])
+
+#Find observations with country, long, and lat - 9,091. We are good! 
+nrow(inventor_df[inventor_df$country=="NZ" & !is.na(inventor_df$longitude) & !is.na(inventor_df$latitude),])
+
+
+#Save 'inventor_df'
+save(inventor_df, file="inventor_df.RData")
 
 
