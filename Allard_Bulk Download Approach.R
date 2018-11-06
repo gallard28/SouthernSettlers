@@ -105,15 +105,17 @@ head(inventor_location_df)
 Patents_file<-"patent.tsv"
 Patents_raw<-read_tsv(Patents_file)
 
+names(Patents_raw)
+
 #Data Cleaning####
+#Inventor_df####
 inventor_backup2_df<-inventor_df
 
 #Add location_id to inventor_df
 inventor_df<-left_join(inventor_df, inventor_location_df, by="inventor_id")
-View(inventor_df)
 
-#Add location information
-inventor_df<-left_join(inventor_df, locations_df, by="location_id")
+#Add location information (if needed) It is not. 
+#inventor_df<-left_join(inventor_df, locations_df, by="location_id")
 
 #Clean 'inventor_df'####
 str(inventor_df)
@@ -121,7 +123,7 @@ str(inventor_df)
 #Convert longitude to numeric
 inventor_df$longitude<-as.numeric(inventor_df$longitude)
 
-#Find NAs on no country listed - 
+#Find NAs on no country listed - 569,702 observations
 NoCountry<-(inventor_df[is.na(inventor_df$country),])
 
 #Remove from dataset - Keep 9,613,849 observations
@@ -139,13 +141,11 @@ nrow(inventor_df[inventor_df$country=="UY",])
 #Find observations with country = UY, long, and lat - 318. We are good! 
 nrow(inventor_df[inventor_df$country=="UY" & !is.na(inventor_df$longitude) & !is.na(inventor_df$latitude),])
 
-
 #Number of results for New Zealand - 9,091
 nrow(inventor_df[inventor_df$country=="NZ",])
 
 #Find observations with country, long, and lat - 9,091. We are good! 
 nrow(inventor_df[inventor_df$country=="NZ" & !is.na(inventor_df$longitude) & !is.na(inventor_df$latitude),])
-
 
 #Save 'inventor_df'
 save(inventor_df, file="inventor_df.RData")
